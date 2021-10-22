@@ -12,7 +12,7 @@
 ### kafka-log-server
 
 - Introduction
-  - Three processes which are producer(push to kafka log data) and consumers(for action log and dashboard)
+  - Three processes which are producer(push to kafka refined data) and consumers(for action log and dashboard)
 - Architecture
   - picture...
 
