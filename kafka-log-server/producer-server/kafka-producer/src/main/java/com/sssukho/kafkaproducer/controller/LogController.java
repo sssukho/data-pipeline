@@ -22,7 +22,11 @@ public class LogController {
     @RequestMapping(value = "/v1/trace", method = RequestMethod.POST)
     public void trace(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
                       @RequestParam Map<String, Object> requestMap) {
+        // Topic for log data
+        Map<String, Object> refinedLogData = refineDataService.refineDataForLog(requestMap);
 
 
+        // Topic for dashboard data
+        Map<String, Object> refinedDashboardData = refineDataService.refineDataForDashboard(requestMap);
     }
 }
