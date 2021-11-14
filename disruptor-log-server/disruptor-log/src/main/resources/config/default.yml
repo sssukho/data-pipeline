@@ -1,0 +1,9 @@
+trace:
+  - name: event_log
+    version: 1.0
+    table: event_log
+    thread: 1
+query:
+  - name: event_log
+    version: 1.0
+    table: event_log

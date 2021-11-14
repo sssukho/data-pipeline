@@ -1,6 +1,7 @@
 package com.sssukho.disruptorlog.service;
 
 import com.sssukho.disruptorlog.meta.TraceMetaInfo;
+import com.sssukho.disruptorlog.util.SQLUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
@@ -34,7 +35,7 @@ public class ArrayProcessingService {
                         logMap.size(),
                         new ParameterizedPreparedStatementSetter<HashMap>() {
                             @Override
-                            public void setValues(PreparedStatement ps, HashMap argument)
+                            public void setValues(PreparedStatement ps, HashMap map)
                                     throws SQLException {
                                 int i = 1;
                                 for(Map.Entry<String, String> entry: info.getColumnTypeMap().entrySet()) {
@@ -43,11 +44,26 @@ public class ArrayProcessingService {
                                         case "process_time":
                                             obj = processTime;
                                             break;
-                                        case "stat_time":
-                                            obj =
+
+                                        case "partition_date":
+                                            obj = map.get(info.getPartition());
+                                            break;
+
+                                        default:
+                                            obj = map.get(entry.getKey());
+                                            break;
                                     }
+                                    SQLUtils.prepareSet(
+                                            ps,
+                                            i,
+                                            entry.getKey(),
+                                            entry.getValue(),
+                                            obj);
+                                    i++;
                                 }
                             }
                         });
+
+        return updateCounts;
     }
 }
