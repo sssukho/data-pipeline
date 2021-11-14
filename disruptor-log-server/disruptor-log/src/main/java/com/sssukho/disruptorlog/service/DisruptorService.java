@@ -7,11 +7,12 @@ import com.lmax.disruptor.dsl.ProducerType;
 import com.sssukho.disruptorlog.dto.LogEvent;
 import com.sssukho.disruptorlog.meta.TraceMetaInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class DisruptorService {
 
     private RingBuffer<LogEvent> RING_BUFFER;
     private EventHandler<LogEvent>[] eventHandlers;
-    private EventTranslatorTwoArg<LogEvent, Object, ResponseEntity> EVENT_TRANSLATOR;
+    private EventTranslatorTwoArg<LogEvent, Object, DeferredResult> EVENT_TRANSLATOR;
     private int asyncQueueSize = DEFAULT_RINGBUFFER_SIZE;
     private volatile boolean initialized = false;
 
@@ -44,8 +45,8 @@ public class DisruptorService {
         this.ais = ais;
     }
 
-    public void event(HashMap logMap, ResponseEntity responseEntity) {
-        this.publishEvent(logMap, responseEntity);
+    public void event(Map logMap, DeferredResult output) {
+        this.publishEvent(logMap, output);
     }
 
     protected void init() {
@@ -86,10 +87,10 @@ public class DisruptorService {
 
             RING_BUFFER = disruptor.getRingBuffer();
             EVENT_TRANSLATOR =
-                    new EventTranslatorTwoArg<LogEvent, Object, ResponseEntity>() {
+                    new EventTranslatorTwoArg<LogEvent, Object, DeferredResult>() {
                         @Override
-                        public void translateTo(LogEvent event, long sequence, Object logString, ResponseEntity responseEntity) {
-                            event.set(logString, responseEntity);
+                        public void translateTo(LogEvent event, long sequence, Object logString, DeferredResult output) {
+                            event.set(logString, output);
                         }
                     };
             initialized = true;
@@ -129,20 +130,20 @@ public class DisruptorService {
     }
 
     // worker threads calls this
-    public void publishEvent(Object logString, ResponseEntity responseEntity) {
+    public void publishEvent(Object logString, DeferredResult output) {
         if (logString == null) {
             return;
         }
 
-        RING_BUFFER.publishEvent(EVENT_TRANSLATOR, logString, responseEntity);
+        RING_BUFFER.publishEvent(EVENT_TRANSLATOR, logString, output);
     }
 
-    boolean tryPublishEvent(Object logString, ResponseEntity responseEntity) {
+    boolean tryPublishEvent(Object logString, DeferredResult output) {
         if (logString == null) {
             return true;
         }
 
-        return RING_BUFFER.tryPublishEvent(EVENT_TRANSLATOR, logString, responseEntity);
+        return RING_BUFFER.tryPublishEvent(EVENT_TRANSLATOR, logString, output);
     }
 
     class EventHandlerImpl<T1, T2> implements EventHandler<LogEvent>, LifecycleAware {

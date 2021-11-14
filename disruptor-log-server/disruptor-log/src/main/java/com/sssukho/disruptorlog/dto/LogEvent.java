@@ -2,19 +2,20 @@ package com.sssukho.disruptorlog.dto;
 
 import com.lmax.disruptor.EventFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.async.DeferredResult;
 
 public class LogEvent {
     long currentTime;
     Object logString;
-    ResponseEntity responseEntity;
+    DeferredResult<ResponseEntity> output;
 
     public LogEvent(long currentTime) {
         this.currentTime = currentTime;
     }
 
-    public void set(Object logString, ResponseEntity responseEntity) {
+    public void set(Object logString, DeferredResult<ResponseEntity> output) {
         this.logString = logString;
-        this.responseEntity = responseEntity;
+        this.output = output;
     }
 
     public Object getLogString() {
@@ -22,12 +23,12 @@ public class LogEvent {
     }
 
     public void setSuccess() {
-        this.responseEntity = ResponseEntity.ok("OKAY");
+        this.output.setResult(ResponseEntity.ok("OKAY"));
     }
 
     public void clear() {
         this.logString = null;
-        this.responseEntity = null;
+        this.output = null;
     }
 
     private static class LogEventFactory implements EventFactory<LogEvent> {
