@@ -20,4 +20,7 @@ public class ParsingKeys {
     /* Fields in log map */
     public static final String LOG_ID = "log_id";
 
+    /* Keys in response message */
+    public static final String RESPONSE_MESSAGE_ERROR_MESSAGE = "errorMessage";
+    public static final String RESPONSE_MESSAGE_ERROR_CODE = "errorCode";
 }

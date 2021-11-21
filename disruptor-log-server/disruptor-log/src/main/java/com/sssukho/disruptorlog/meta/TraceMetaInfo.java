@@ -19,5 +19,4 @@ public class TraceMetaInfo {
     TreeMap<String, TreeMap<String, String>> chainColumnTypeMap;
 
 
-
 }
