@@ -6,17 +6,25 @@ import com.sssukho.disruptorlog.constant.ConstValues;
 import com.sssukho.disruptorlog.constant.ParsingKeys;
 import com.sssukho.disruptorlog.meta.MetaInfo;
 import com.sssukho.disruptorlog.meta.TraceMetaInfo;
+import com.sssukho.disruptorlog.util.TempFileUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MetaDataService {
@@ -29,6 +37,7 @@ public class MetaDataService {
 
     private final ArrayProcessingService ais;
     private final JdbcTemplate jdbcTemplate;
+    private final ResourceLoader resourceLoader;
 
     public DatabaseMetaData databaseMetaData;
 
@@ -36,10 +45,16 @@ public class MetaDataService {
     public void init() throws Exception {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         // classpath 기준으로 xxx.yml configuration 파일 read
-        ClassPathResource classPathResource = new ClassPathResource(ConstValues.CONFIG_FILE_PATH);
-        File configFileDirectory = classPathResource.getFile();
-        File[] metaConfigFiles = configFileDirectory.listFiles();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL metaConfigUrl = classLoader.getResource(ConstValues.CONFIG_FILE_PATH);
+        File metaConfigUrlDir = FileUtils.toFile(metaConfigUrl);
 
+        if (metaConfigUrlDir == null) {
+            metaConfigUrlDir = Files.createTempDirectory("temp-config").toFile();
+            TempFileUtils.copyResourcesRecursively(metaConfigUrl, metaConfigUrlDir);
+        }
+
+        File[] metaConfigFiles = metaConfigUrlDir.listFiles();
         ArrayList<MetaInfo> metaInfoList = new ArrayList<>(metaConfigFiles.length);
 
         for(File configFile : metaConfigFiles) {
