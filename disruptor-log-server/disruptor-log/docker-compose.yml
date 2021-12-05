@@ -8,6 +8,8 @@ services:
     container_name: disruptor-log
     depends_on:
       - postgres-for-log
+    ports:
+      - "9099:9099"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-for-log:5432/log?stringtype=unspecified
       - SPRING_DATASOURCE_USERNAME=sssukho
