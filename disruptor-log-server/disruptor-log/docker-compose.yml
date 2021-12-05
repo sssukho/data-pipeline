@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  disruptor-log:
+    image: 'disruptor-log'
+    build:
+      context: .
+    container_name: disruptor-log
+    depends_on:
+      - postgres-for-log
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-for-log:5432/log?stringtype=unspecified
+      - SPRING_DATASOURCE_USERNAME=sssukho
+      - SPRING_DATASOURCE_PASSWORD=tjzhtjzh01
+  
+  postgres-for-log:
+    image: 'postgres'
+    container_name: postgres-for-log
+    environment:
+      - POSTGRES_USER=sssukho
+      - POSTGRES_PASSWORD=tjzhtjzh01
