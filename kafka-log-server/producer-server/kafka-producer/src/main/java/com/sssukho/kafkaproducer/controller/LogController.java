@@ -1,8 +1,8 @@
 package com.sssukho.kafkaproducer.controller;
 
-import com.sssukho.kafkaproducer.service.PushService;
 import com.sssukho.kafkaproducer.service.RefineDataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,16 +17,13 @@ import java.util.Map;
 public class LogController {
 
     private final RefineDataService refineDataService;
-    private final PushService pushService;
 
     @RequestMapping(value = "/v1/trace", method = RequestMethod.POST)
-    public void trace(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-                      @RequestParam Map<String, Object> requestMap) {
-        // Topic for log data
-        Map<String, Object> refinedLogData = refineDataService.refineDataForLog(requestMap);
+    public HttpEntity trace(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+                            @RequestParam Map<String, Object> requestMap) {
 
+        HttpEntity processResult = refineDataService.refineData(requestMap);
 
-        // Topic for dashboard data
-        Map<String, Object> refinedDashboardData = refineDataService.refineDataForDashboard(requestMap);
+        return processResult;
     }
 }
