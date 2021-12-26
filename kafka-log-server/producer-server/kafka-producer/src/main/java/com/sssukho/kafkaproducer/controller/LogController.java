@@ -18,7 +18,7 @@ public class LogController {
 
     private final RefineDataService refineDataService;
 
-    @RequestMapping(value = "/v1/trace", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/trace/audit", method = RequestMethod.POST)
     public HttpEntity trace(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
                             @RequestParam Map<String, Object> requestMap) {
 
