@@ -15,13 +15,13 @@
             "request_id": "38492f11-1565-40db-8e50-8a9e0f6c9d00",
             "user_id": "sssukho",
             "user_name": "임석호",
-          	"user_type": "Member",
+            "user_type": "Member",
             "event_type": "Login",
-          	"application_id": "03e78a26-69d4-4011-928d-7fca55779b07",
+            "application_id": "03e78a26-69d4-4011-928d-7fca55779b07",
             "application_name": "iCloud",
             "ip": "xxx.xxx.xx.xx",
             "location": "Mapo-Gu, Seoul",
-          	"user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
             "event_result": "Success"
         }
     ]
@@ -88,13 +88,13 @@
             "request_id": "38492f11-1565-40db-8e50-8a9e0f6c9d00",
             "user_id": "sssukho",
             "user_name": "임석호",
-          	"user_type": "Member",
+            "user_type": "Member",
             "event_type": "Login",
-          	"application_id": "03e78a26-69d4-4011-928d-7fca55779b07",
+            "application_id": "03e78a26-69d4-4011-928d-7fca55779b07",
             "application_name": "iCloud",
             "ip": "xxx.xxx.xx.xx",
             "location": "Mapo-Gu, Seoul",
-          	"user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62",
             "event_result": "Success"
         }
     ]
