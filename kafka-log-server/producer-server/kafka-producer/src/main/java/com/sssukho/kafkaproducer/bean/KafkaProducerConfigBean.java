@@ -27,8 +27,8 @@ public class KafkaProducerConfigBean {
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> producerProperties = new HashMap<>();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProducerConfig.getBootStrapServer());
-        producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+        producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "com.apache.kafka.serialization.StringSerializer");
+        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "package com.sssukho.kafkaproducer.serializer.CustomSerializer");
 
         return new DefaultKafkaProducerFactory<>(producerProperties);
     }

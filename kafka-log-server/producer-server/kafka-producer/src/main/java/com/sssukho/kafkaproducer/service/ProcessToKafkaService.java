@@ -1,50 +1,51 @@
 package com.sssukho.kafkaproducer.service;
 
-import com.sssukho.kafkaproducer.dto.ProcessResultDTO;
-import com.sssukho.kafkaproducer.service.audit.SendToAuditTopicService;
-import com.sssukho.kafkaproducer.service.audit.RefineAuditDataService;
+import com.sssukho.kafkaproducer.dto.PreProcessedData;
+import com.sssukho.kafkaproducer.dto.RequestMessageDTO;
+import com.sssukho.kafkaproducer.dto.ResponseMessageDTO;
+import com.sssukho.kafkaproducer.exception.PushToKafkaException;
+import com.sssukho.kafkaproducer.service.refine.RefineAuditDataService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProcessToKafkaService {
 
-    private static final String AUDIT = "audit";
+    private static final String MESSAGE_TYPE_AUDIT = "AUDIT";
+    private static final String MESSAGE_TYPE_SYSTEM = "SYSTEM";
 
-    @Autowired
-    RefineAuditDataService refineAuditDataService;
-    @Autowired
-    SendToAuditTopicService sendToAuditTopicService;
+    private final RefineAuditDataService refineAuditDataService;
+    private final SendToKafkaService sendToKafkaService;
 
-    public ProcessResultDTO process(ProcessResultDTO processResult) {
+    public ResponseMessageDTO process(RequestMessageDTO requestMessageDTO) {
 
-        String logType = (String) ((HashMap) processResult.getRequestMap()).get("type");
+        String type = requestMessageDTO.getType();
+        PreProcessedData preProcessedData = new PreProcessedData();
+
+        // set rawData
+        preProcessedData.setLogData(requestMessageDTO.getData());
 
         // refine
-        switch(logType) {
-            case AUDIT:
-                refineAuditDataService.refine(processResult);
+        switch(type.toUpperCase()) {
+            case MESSAGE_TYPE_AUDIT:
+                refineAuditDataService.refine(preProcessedData);
+                break;
+
+            case MESSAGE_TYPE_SYSTEM:
+//                refineSystemDataService.refine(preProcessedData);
+                break;
+
+            default:
+                // type에 따라 byte 형태로 kafka send
                 break;
         }
 
-        // refine 하다가 에러 발생한 경우 (데이터가 적절하지 못한 경우)
-        if(!processResult.getResopnseEntity().getStatusCode().is2xxSuccessful()) {
-            return processResult;
-        }
+        // send to kafka
+        sendToKafkaService.send(type.toUpperCase(), preProcessedData);
 
-        // push to kafka broker
-        switch(logType) {
-            case AUDIT:
-                sendToAuditTopicService.send(processResult);
-                break;
-        }
-
-        return processResult;
+        return preProcessedData.getResponseMessageDTO();
     }
-
-
 }
