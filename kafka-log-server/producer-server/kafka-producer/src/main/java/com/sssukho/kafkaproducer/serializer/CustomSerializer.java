@@ -14,7 +14,6 @@ public class CustomSerializer implements Serializer {
 
     @Override
     public void configure(Map configs, boolean isKey) {
-
     }
 
     @Override

@@ -9,5 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaProducerConfig {
     private String bootStrapServer;
-    private String serializer;
+    private String keySerializer;
+    private String valueSerializer;
 }
