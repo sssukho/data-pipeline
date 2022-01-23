@@ -35,4 +35,22 @@ public class AuditData {
     String userAgent;
     @JsonProperty(value="event_result")
     String eventResult;
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("logDate: " + logDate + "\n");
+        sb.append("requestId: " + requestId + "\n");
+        sb.append("userId: " + userId + "\n");
+        sb.append("userName: " + userName + "\n");
+        sb.append("userType: " + userType + "\n");
+        sb.append("eventType: " + eventType + "\n");
+        sb.append("applicationId: " + applicationId + "\n");
+        sb.append("applicationName: " + applicationName + "\n");
+        sb.append("ip: " + ip + "\n");
+        sb.append("location: " + location + "\n");
+        sb.append("userAgent: " + userAgent + "\n");
+        sb.append("eventResult: " + eventResult + "\n");
+
+        return sb.toString();
+    }
 }
