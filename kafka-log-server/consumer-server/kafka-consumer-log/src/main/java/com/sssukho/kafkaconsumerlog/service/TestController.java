@@ -1,27 +1,30 @@
 package com.sssukho.kafkaconsumerlog.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sssukho.kafkaconsumerlog.constants.Group;
-import com.sssukho.kafkaconsumerlog.constants.Topic;
 import com.sssukho.kafkaconsumerlog.dao.AuditLogEntity;
 import com.sssukho.kafkaconsumerlog.dto.AuditData;
 import com.sssukho.kafkaconsumerlog.repository.AuditLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Slf4j
-@Service
+@Controller
 @RequiredArgsConstructor
-public class ConsumeFromKafkaService {
-    private static ObjectMapper mapper = new ObjectMapper();
+public class TestController {
 
     private final AuditLogRepository auditLogRepository;
 
-    @KafkaListener(topics = Topic.AUDIT_LOG, groupId = Group.AUDIT_LOG_GROUP, containerFactory = "auditDataConcurrentKafkaListenerContainerFactory")
-    public void consume(AuditData auditData) {
-        log.info("Consumed message : {}", auditData.toString());
+    @RequestMapping(value = { "/v1/test"}, method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<?> test(@RequestBody AuditData auditData) {
+
+        log.info("#### test controller called");
+
+        ResponseEntity responseEntity = ResponseEntity.ok("OKAY");
 
         AuditLogEntity auditLogEntity =
                 AuditLogEntity.builder()
@@ -40,13 +43,7 @@ public class ConsumeFromKafkaService {
                 .build();
 
         auditLogRepository.save(auditLogEntity);
-        log.info("audit data inserted into db");
+
+        return responseEntity;
     }
-
-    @KafkaListener(topics = Topic.AUDIT_LOG, containerFactory = "auditDataConcurrentKafkaListenerContainerFactory")
-    public void consume2(String message) {
-        log.info(message);
-    }
-
-
 }

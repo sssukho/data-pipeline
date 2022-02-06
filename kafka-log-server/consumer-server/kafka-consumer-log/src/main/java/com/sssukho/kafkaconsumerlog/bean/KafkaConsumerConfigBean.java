@@ -33,6 +33,7 @@ public class KafkaConsumerConfigBean {
     public ConcurrentKafkaListenerContainerFactory<String, AuditData> auditDataConcurrentKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, AuditData> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(auditDataConsumerFactory());
+        factory.setAutoStartup(false);
         return factory;
     }
 
