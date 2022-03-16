@@ -9,7 +9,10 @@ import com.sssukho.kafkaproducer.dto.audit.AuditStatistics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
 @Service
@@ -33,8 +36,39 @@ public class SendToKafkaService<T> {
 
     private void sendToAuditTopics(PreProcessedData preProcessedData) {
         try {
-            auditDataKafkaTemplate.send(Topic.AUDIT_LOG, (AuditData) preProcessedData.getLogData());
-            auditStatisticsKafkaTemplate.send(Topic.AUDIT_STATISTICS, (AuditStatistics) preProcessedData.getStatisticsData());
+
+            ListenableFuture<SendResult<String, AuditData>> auditDataFuture =
+                    auditDataKafkaTemplate.send(Topic.AUDIT_LOG, (AuditData) preProcessedData.getLogData());
+
+            auditDataFuture.addCallback(new ListenableFutureCallback<SendResult<String, AuditData>>() {
+                @Override
+                public void onFailure(Throwable ex) {
+                    onFailureErrorMessage(ex);
+                }
+
+                @Override
+                public void onSuccess(SendResult<String, AuditData> result) {
+                    onSuccessMessage(result);
+                }
+            });
+
+            ListenableFuture<SendResult<String, AuditStatistics>> auditStatisticsFuture =
+                    auditStatisticsKafkaTemplate.send(Topic.AUDIT_STATISTICS, (AuditStatistics) preProcessedData.getStatisticsData());
+
+            auditStatisticsFuture.addCallback(new ListenableFutureCallback<SendResult<String, AuditStatistics>>() {
+                @Override
+                public void onFailure(Throwable ex) {
+                    onFailureErrorMessage(ex);
+                }
+
+                @Override
+                public void onSuccess(SendResult<String, AuditStatistics> result) {
+                    onSuccessMessage(result);
+                }
+            });
+
+//            auditDataKafkaTemplate.send(Topic.AUDIT_LOG, (AuditData) preProcessedData.getLogData());
+//            auditStatisticsKafkaTemplate.send(Topic.AUDIT_STATISTICS, (AuditStatistics) preProcessedData.getStatisticsData());
         } catch(Exception e) {
             log.error("", e);
             preProcessedData.setResponseMessageDTO(new ResponseMessageDTO(e.getLocalizedMessage(), 500));
@@ -43,5 +77,14 @@ public class SendToKafkaService<T> {
 
         preProcessedData.setResponseMessageDTO(
                 new ResponseMessageDTO("Complete to send kafka", 200));
+    }
+
+
+    private void onFailureErrorMessage(Throwable ex) {
+        log.error("Unable to send message: {}", ex.getMessage());
+    }
+
+    private void onSuccessMessage(SendResult sendResult) {
+        log.info("Sent message with offset: {}", sendResult.getRecordMetadata().offset());
     }
 }
